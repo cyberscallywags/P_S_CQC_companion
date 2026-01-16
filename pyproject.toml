@@ -1,0 +1,59 @@
+[project]
+name = "bibliotech"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.128.0",
+    "logfire[fastapi]>=0.50.0",
+    "neo4j>=6.1.0",
+    "pydantic-ai>=1.41.0",
+    "pydantic-settings>=2.1.0",
+    "python-json-logger>=4.0.0",
+    "requests>=2.32.5",
+    "opensearch-py",
+    "psycopg2-binary",
+    "pyarrow",
+    "uvicorn>=0.32.0"
+]
+
+[dependency-groups]
+dev = [
+    "locust>=2.43.1",
+    "pydantic>=2.12.5",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.11",
+    "taskipy>=1.14.1",
+    "watchfiles>=1.1.0",
+    "httpx>=0.28.1",
+    "pre-commit>=4.3.0",
+    "pytest-cov>=7.0.0",
+    "pytest-html>=4.1.1",
+    "allure-pytest>=2.15.0",
+    "requests>=2.32.5",
+]
+
+[tool.taskipy.tasks]
+test-run = "python3 -m pytest"
+test-watch = "watchfiles 'python3 -m pytest -vv -s' src/ tests/ --ignore-path .venv --ignore-path .git"
+coverage = "python3 -m pytest --cov=src --cov-report=html"
+allure-serve = "allure serve reports/allure"
+lint = "ruff check src tests"
+lint-fix = "ruff check src tests --fix"
+format = "black src tests"
+pre-commit = "pre-commit run --all-files"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-q -ra -vv --cov=src --cov-report=html:reports/html --cov-report=xml --cov-fail-under=60 --alluredir=reports/allure"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+pythonpath = ["src"]
+
+[tool.coverage.html]
+directory = "reports/html"
+
+[tool.logfire]
+ignore_no_config = true
