@@ -1,7 +1,10 @@
 """Neo4j Graph Database Service with Logfire observability."""
 
+from typing import Any
+
 import logfire
-from neo4j import AsyncDriver, basic_auth, graphemes
+from neo4j import AsyncGraphDatabase, basic_auth
+from neo4j.asynchronous import AsyncDriver
 from neo4j.exceptions import ServiceUnavailable
 
 
@@ -35,14 +38,15 @@ class GraphService:
         """Establish connection to Neo4j database."""
         with logfire.span("neo4j_connect"):
             try:
-                self.driver = graphemes.AsyncGraphDatabase.driver(
+                self.driver = AsyncGraphDatabase.driver(
                     self.uri,
                     auth=basic_auth(self.username, self.password),
                 )
                 # Test connection
-                async with self.driver.session() as session:
-                    result = await session.run("RETURN 1")
-                    await result.consume()
+                if self.driver:
+                    async with self.driver.session() as session:
+                        result = await session.run("RETURN 1")
+                        await result.consume()
                 logfire.info("Successfully connected to Neo4j database")
             except ServiceUnavailable as e:
                 logfire.error("Failed to connect to Neo4j", error=str(e))
@@ -52,14 +56,14 @@ class GraphService:
         """Close connection to Neo4j database."""
         with logfire.span("neo4j_disconnect"):
             if self.driver:
-                await self.driver.aclose()
+                await self.driver.close()
                 logfire.info("Disconnected from Neo4j database")
 
     async def execute_query(
         self,
         query: str,
-        parameters: dict | None = None,
-    ) -> list[dict]:
+        parameters: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
         """Execute a Cypher query.
 
         Args:
@@ -78,7 +82,8 @@ class GraphService:
                 raise RuntimeError("Graph service not connected")
 
             async with self.driver.session() as session:
-                result = await session.run(query, parameters or {})
+                params = parameters or {}
+                result = await session.run(query, **params)
                 records = await result.data()
                 logfire.debug(f"Query returned {len(records)} records")
                 return records
@@ -86,8 +91,8 @@ class GraphService:
     async def get_node(
         self,
         label: str,
-        properties: dict,
-    ) -> dict | None:
+        properties: dict[str, Any],
+    ) -> dict[str, Any] | None:
         """Get a single node by label and properties.
 
         Args:
@@ -105,8 +110,8 @@ class GraphService:
     async def create_node(
         self,
         label: str,
-        properties: dict,
-    ) -> dict:
+        properties: dict[str, Any],
+    ) -> dict[str, Any]:
         """Create a new node.
 
         Args:

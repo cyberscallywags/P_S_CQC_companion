@@ -37,10 +37,7 @@ async def lifespan(app: FastAPI):
 
 
 # Initialize Logfire for observability
-logfire.configure(
-    project_name=settings.logfire_project_name,
-    token=settings.logfire_token,
-)
+logfire.configure(token=settings.logfire_token)
 
 app = FastAPI(lifespan=lifespan)
 
