@@ -1,11 +1,15 @@
 """Configuration loader for environment variables."""
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
+
+    model_config = ConfigDict(
+        env_file=".env", case_sensitive=False, populate_by_name=True
+    )
 
     # Neo4j Configuration
     neo4j_uri: str = Field(default="bolt://localhost:7687", alias="NEO4J_URI")
@@ -21,13 +25,6 @@ class Settings(BaseSettings):
     # Application Configuration
     env: str = Field(default="development", alias="ENV")
     debug: bool = Field(default=True, alias="DEBUG")
-
-    class Config:
-        """Pydantic config for settings."""
-
-        env_file = ".env"
-        case_sensitive = False
-        populate_by_name = True
 
 
 settings = Settings()
