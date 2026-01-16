@@ -4,7 +4,6 @@ from typing import Any
 
 import logfire
 from neo4j import AsyncGraphDatabase, basic_auth
-from neo4j.asynchronous import AsyncDriver
 from neo4j.exceptions import ServiceUnavailable
 
 
@@ -27,7 +26,6 @@ class GraphService:
         self.uri = uri
         self.username = username
         self.password = password
-        self.driver: AsyncDriver | None = None
         logfire.info(
             "GraphService initialized",
             uri=uri,
