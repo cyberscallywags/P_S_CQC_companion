@@ -4,14 +4,14 @@ import logging
 import os
 import sys
 
+# Add src to path before imports
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+
 import pytest
 
-from src.logging_config import setup_json_logging
+from logging_config import setup_json_logging
 
 logger = logging.getLogger(__name__)
-
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
 
 
 @pytest.fixture(scope="session", autouse=True)

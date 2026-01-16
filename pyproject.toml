@@ -48,8 +48,9 @@ pre-commit = "pre-commit run --all-files"
 [tool.pytest.ini_options]
 minversion = "7.0"
 addopts = "-q -ra -vv --cov=src --cov-report=html:reports/html --cov-report=xml --cov-fail-under=75 --alluredir=reports/allure"
-testpaths = ["tests", "src"]
+testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
+pythonpath = ["src"]
 
 [tool.coverage.html]
 directory = "reports/html"
